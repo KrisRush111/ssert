@@ -82,7 +82,7 @@
         }
         
         @keyframes photoIn {
-            0% { opacity: 0; transform: translateY(50px) scale(0.8); }
+            0% { opacity: 0; transform: translateY(30px) scale(0.9); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         
@@ -111,13 +111,29 @@
             50% { opacity: 1; transform: scale(1); }
         }
         
-        /* Фото рамки */
+        /* Фото рамки - адаптивные */
         .photo-frame {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             transition: transform 0.3s ease;
+            flex-shrink: 0;
+            overflow: hidden;
         }
         .photo-frame:hover {
             transform: scale(1.05) rotate(2deg);
+        }
+        
+        /* Мобильная адаптация фото - вертикальное расположение, крупные */
+        @media (max-width: 768px) {
+            .photo-frame {
+                width: 46% !important;
+                max-width: 180px !important;
+                min-width: 140px !important;
+            }
+            .photo-frame img {
+                height: 260px !important; /* Вертикальные/высокие фото */
+                width: 100% !important;
+                object-fit: cover;
+            }
         }
         
         .hidden-section {
@@ -171,18 +187,18 @@
                     <i data-lucide="heart" class="w-12 h-12 mx-auto mb-4 text-white/80 animate-bounce"></i>
                 </div>
                 
-                <h1 id="mainQuestion" class="text-5xl md:text-7xl font-romantic text-white mb-12 pulse-text leading-tight px-4">
+                <h1 id="mainQuestion" class="text-4xl md:text-7xl font-romantic text-white mb-8 md:mb-12 pulse-text leading-tight px-4">
                     <!-- Текст будет вставлен через JS -->
                 </h1>
                 
-                <div class="flex flex-row justify-center gap-4 md:gap-8 flex-wrap relative" style="min-height: 100px;">
+                <div class="flex flex-row justify-center gap-3 md:gap-8 flex-nowrap relative px-2" style="min-height: 80px;">
                     <button id="yesBtn" onclick="sayYes()" 
-                        class="px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-110 shadow-2xl min-w-[120px]">
+                        class="px-6 md:px-8 py-3 md:py-4 bg-white text-gray-900 rounded-full font-bold text-lg md:text-xl hover:bg-gray-100 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px]">
                         Да ❤️
                     </button>
                     
                     <button id="noBtn" onmouseover="runAway()" ontouchstart="runAway(event)"
-                        class="runaway-btn px-8 py-4 bg-white/20 backdrop-blur text-white rounded-full font-bold text-xl border-2 border-white/50 hover:bg-white/30 transition-all min-w-[120px] relative">
+                        class="runaway-btn px-6 md:px-8 py-3 md:py-4 bg-white/20 backdrop-blur text-white rounded-full font-bold text-lg md:text-xl border-2 border-white/50 hover:bg-white/30 transition-all min-w-[100px] md:min-w-[120px] relative">
                         Нет 💔
                     </button>
                 </div>
@@ -190,28 +206,29 @@
             
             <!-- Success Section (Hidden initially) -->
             <div id="successSection" class="hidden-section flex-col items-center text-center w-full max-w-4xl px-4">
-                <h2 id="successText" class="text-4xl md:text-6xl font-romantic text-white mb-8 glow-purple animate-bounce">
+                <h2 id="successText" class="text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-purple animate-bounce leading-tight">
                     Ура! Ты моя валентинка! 💕
                 </h2>
                 
-                <div class="flex flex-col md:flex-row gap-6 justify-center items-center w-full mb-8">
-                    <div class="photo-frame bg-white p-3 rounded-2xl transform -rotate-3 w-full md:w-auto max-w-sm opacity-0">
-                        <img src="111.jpg" alt="Photo 1" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                <!-- Контейнер фото - вертикальные картинки бок о бок -->
+                <div class="flex flex-row flex-nowrap gap-2 md:gap-6 justify-center items-center w-full mb-6 md:mb-8 px-2 overflow-visible">
+                    <div class="photo-frame bg-white p-2 md:p-3 rounded-xl md:rounded-2xl transform -rotate-2 md:-rotate-3 w-[46%] md:w-auto md:max-w-sm opacity-0 flex-shrink-0">
+                        <img src="111.jpg" alt="Photo 1" class="w-full h-64 md:h-80 object-cover rounded-lg md:rounded-xl">
                     </div>
-                    <div class="photo-frame bg-white p-3 rounded-2xl transform rotate-3 w-full md:w-auto max-w-sm opacity-0">
-                        <img src="222.jpg" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                    <div class="photo-frame bg-white p-2 md:p-3 rounded-xl md:rounded-2xl transform rotate-2 md:rotate-3 w-[46%] md:w-auto md:max-w-sm opacity-0 flex-shrink-0">
+                        <img src="222.jpg" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-lg md:rounded-xl">
                     </div>
                 </div>
                 
-                <div class="bg-white/20 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-lg border border-white/30">
-                    <p class="text-xl md:text-2xl font-handwritten text-white leading-relaxed">
+                <div class="bg-white/20 backdrop-blur-md rounded-3xl p-5 md:p-8 max-w-lg border border-white/30 mx-2">
+                    <p class="text-lg md:text-2xl font-handwritten text-white leading-relaxed">
                         Это будет наш самый особенный день! <br>
                         Спасибо, что ты есть в моей жизни! 🌟<br>
                         Люблю тебя! 💖
                     </p>
                 </div>
                 
-                <button onclick="reset()" class="mt-8 text-white/80 hover:text-white underline font-handwritten text-lg">
+                <button onclick="reset()" class="mt-6 md:mt-8 text-white/80 hover:text-white underline font-handwritten text-lg">
                     Вернуться назад
                 </button>
             </div>
@@ -314,21 +331,21 @@
                 screen.className = 'min-h-screen relative overflow-hidden bg-purple-gradient';
                 question.textContent = 'Дич, станешь моей валентинкой?';
                 question.classList.add('glow-purple');
-                yesBtn.className = 'px-8 py-4 bg-purple-600 text-white rounded-full font-bold text-xl hover:bg-purple-700 transition-all transform hover:scale-110 shadow-2xl min-w-[120px] border-2 border-purple-300';
-                successText.className = 'text-4xl md:text-6xl font-romantic text-white mb-8 glow-purple animate-bounce';
+                yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-purple-600 text-white rounded-full font-bold text-lg md:text-xl hover:bg-purple-700 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-purple-300';
+                successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-purple animate-bounce leading-tight';
             } else {
                 // Голубая тема для Ruzz
                 screen.className = 'min-h-screen relative overflow-hidden bg-blue-gradient';
                 question.textContent = 'Ruzz, станешь моей валентинкой?';
                 question.classList.add('glow-blue');
-                yesBtn.className = 'px-8 py-4 bg-blue-500 text-white rounded-full font-bold text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[120px] border-2 border-blue-300';
-                successText.className = 'text-4xl md:text-6xl font-romantic text-white mb-8 glow-blue animate-bounce';
+                yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-blue-500 text-white rounded-full font-bold text-lg md:text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-blue-300';
+                successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-blue animate-bounce leading-tight';
             }
             
             createHearts(theme);
             createSparkles();
             
-            // Сброс состояния - ИСПРАВЛЕНО: используем правильные классы
+            // Сброс состояния
             questionSection.classList.remove('hidden-section');
             successSection.classList.add('hidden-section');
             successSection.classList.remove('visible-section');
@@ -381,7 +398,7 @@
             return (Math.abs(btnCenterX - centerX) < 150 && Math.abs(btnCenterY - centerY) < 100);
         }
         
-        // Нажатие "Да" - ИСПРАВЛЕНО: используем правильные классы
+        // Нажатие "Да"
         function sayYes() {
             const questionSection = document.getElementById('questionSection');
             const successSection = document.getElementById('successSection');
@@ -394,10 +411,9 @@
             // Добавляем классы анимации фото с задержкой
             const photos = document.querySelectorAll('.photo-frame');
             photos.forEach((photo, index) => {
-                // Сначала делаем видимым (opacity-0 убрано через класс photo-appear)
                 setTimeout(() => {
                     photo.classList.add('photo-appear');
-                }, index * 300 + 100);
+                }, index * 200 + 100);
             });
             
             // Запускаем салют с сердечками и звездочками
