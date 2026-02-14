@@ -126,11 +126,11 @@
         @media (max-width: 768px) {
             .photo-frame {
                 width: 46% !important;
-                max-width: 180px !important;
-                min-width: 140px !important;
+                max-width: 270px !important;
+                min-width: 240px !important;
             }
             .photo-frame img {
-                height: 260px !important; /* Вертикальные/высокие фото */
+                height: 330px !important; /* Вертикальные/высокие фото */
                 width: 100% !important;
                 object-fit: cover;
             }
@@ -142,6 +142,11 @@
 
         .visible-section {
             display: flex !important;
+        }
+        
+        /* Временное сообщение */
+        #tempMessageSection {
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
@@ -204,6 +209,16 @@
                 </div>
             </div>
             
+            <!-- Temporary Message Section (ВНЕ successSection!) -->
+            <div id="tempMessageSection" class="hidden-section flex-col items-center justify-center text-center w-full max-w-4xl px-4" style="min-height: 50vh;">
+                <div class="text-8xl md:text-9xl mb-6 md:mb-8 animate-bounce">
+                    😂🫵🏻🫵🏻
+                </div>
+                <h2 class="text-5xl md:text-7xl font-bold text-white glow-purple">
+                    ХАХА, ты серьезно думала,<br>что я тебе дам это сделать?
+                </h2>
+            </div>
+            
             <!-- Success Section (Hidden initially) -->
             <div id="successSection" class="hidden-section flex-col items-center text-center w-full max-w-4xl px-4">
                 <h2 id="successText" class="text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-purple animate-bounce leading-tight">
@@ -219,12 +234,12 @@
                         <img src="222.jpg" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-lg md:rounded-xl">
                     </div>
                 </div>
-                
+
                 <div class="bg-white/20 backdrop-blur-md rounded-3xl p-5 md:p-8 max-w-lg border border-white/30 mx-2">
                     <p class="text-lg md:text-2xl font-handwritten text-white leading-relaxed">
-                        Это будет наш самый особенный день! <br>
-                        Спасибо, что ты есть в моей жизни! 🌟<br>
-                        Люблю тебя! 💖
+                        ОПА! <br>
+                        ОПА! 🌟<br>
+                        ОПААААА! 💖
                     </p>
                 </div>
                 
@@ -238,8 +253,10 @@
     <script>
         // Инициализация иконок
         lucide.createIcons();
-        
+        let noClickCount = 0;
+        let tempMessageTimer = null;
         let currentTheme = '';
+        
         const correctCodes = {
             'RUZZ': 'blue',
             'DICH': 'purple'
@@ -336,7 +353,7 @@
             } else {
                 // Голубая тема для Ruzz
                 screen.className = 'min-h-screen relative overflow-hidden bg-blue-gradient';
-                question.textContent = 'Ruzz, станешь моей валентинкой?';
+                question.textContent = 'Рузик, станешь моей валентинкой?';
                 question.classList.add('glow-blue');
                 yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-blue-500 text-white rounded-full font-bold text-lg md:text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-blue-300';
                 successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-blue animate-bounce leading-tight';
@@ -350,17 +367,40 @@
             successSection.classList.add('hidden-section');
             successSection.classList.remove('visible-section');
             
+            // Сброс временного сообщения
+            const tempSection = document.getElementById('tempMessageSection');
+            tempSection.classList.add('hidden-section');
+            tempSection.classList.remove('visible-section');
+            
             // Сброс кнопки "Нет"
             const noBtn = document.getElementById('noBtn');
+            noBtn.style.display = 'block';
             noBtn.style.position = 'relative';
             noBtn.style.left = '0';
             noBtn.style.top = '0';
             noBtn.style.transform = 'none';
+            
+            // Сброс счетчика
+            noClickCount = 0;
+            if (tempMessageTimer) {
+                clearTimeout(tempMessageTimer);
+                tempMessageTimer = null;
+            }
         }
         
         // Убегающая кнопка
         function runAway(event) {
             if (event) event.preventDefault();
+            
+            noClickCount++;
+            console.log('No click count:', noClickCount); // Для отладки
+            
+            // Если нажали/навели третий раз
+            if (noClickCount >= 3) {
+                // Показываем временное сообщение
+                showTempMessage();
+                return;
+            }
             
             const btn = document.getElementById('noBtn');
             const rect = btn.getBoundingClientRect();
@@ -388,7 +428,43 @@
             // Добавляем эффект ухода
             btn.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
         }
-        
+
+        function showTempMessage() {
+            // Очищаем предыдущий таймер если был
+            if (tempMessageTimer) {
+                clearTimeout(tempMessageTimer);
+            }
+            
+            // Получаем секции
+            const questionSection = document.getElementById('questionSection');
+            const tempSection = document.getElementById('tempMessageSection');
+            const noBtn = document.getElementById('noBtn');
+            
+            // Скрываем вопрос и показываем временное сообщение
+            questionSection.classList.add('hidden-section');
+            tempSection.classList.remove('hidden-section');
+            tempSection.classList.add('visible-section', 'flex');
+            
+            // Через 3 секунды возвращаем вопрос и убираем кнопку "Нет"
+            tempMessageTimer = setTimeout(() => {
+                // Скрываем временное сообщение
+                tempSection.classList.add('hidden-section');
+                tempSection.classList.remove('visible-section');
+                
+                // Показываем вопрос
+                questionSection.classList.remove('hidden-section');
+                
+                // Навсегда скрываем кнопку "Нет"
+                noBtn.style.display = 'none';
+                
+                // Сбрасываем счетчик
+                noClickCount = 0;
+                
+                // Очищаем таймер
+                tempMessageTimer = null;
+            }, 3000); // 3000 миллисекунд = 3 секунды
+        }
+
         // Проверка, не попадает ли кнопка в центр (где кнопка "Да")
         function isNearCenter(x, y, w, h, btnW, btnH) {
             const centerX = w / 2;
@@ -487,6 +563,11 @@
             successSection.classList.add('hidden-section');
             successSection.classList.remove('visible-section');
             
+            // Скрываем временное сообщение если висит
+            const tempSection = document.getElementById('tempMessageSection');
+            tempSection.classList.add('hidden-section');
+            tempSection.classList.remove('visible-section');
+            
             // Очистка фото
             document.querySelectorAll('.photo-frame').forEach(p => {
                 p.classList.remove('photo-appear');
@@ -496,6 +577,20 @@
             // Очистка анимаций градиента
             const screen = document.getElementById('valentineScreen');
             screen.className = 'hidden-section min-h-screen relative overflow-hidden';
+            
+            // Сбрасываем счетчик, таймер и показываем кнопку "Нет"
+            noClickCount = 0;
+            if (tempMessageTimer) {
+                clearTimeout(tempMessageTimer);
+                tempMessageTimer = null;
+            }
+            
+            const noBtn = document.getElementById('noBtn');
+            noBtn.style.display = 'block';
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0';
+            noBtn.style.top = '0';
+            noBtn.style.transform = 'none';
         }
         
         // Предотвращаем выход кнопки за экран при resize
