@@ -60,6 +60,16 @@
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
         }
+        /* Оранжевый градиент анимация */
+        .bg-orange-gradient {
+            background: linear-gradient(-45deg, #ff6b6b, #f97316, #fdba74, #ea580c);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        /* Свечение для оранжевой темы */
+    .glow-orange {
+        text-shadow: 0 0 20px rgba(249, 115, 22, 0.8), 0 0 40px rgba(249, 115, 22, 0.4);
+    }
         
         @keyframes gradient {
             0% { background-position: 0% 50%; }
@@ -318,18 +328,24 @@
         let tempMessageTimer = null;
         let currentTheme = '';
         
-        const correctCodes = {
-            'RUZZ': 'blue',
-            'DICH': 'purple'
-        };
+const correctCodes = {
+    'RUZZ': 'blue',
+    'DICH': 'purple',
+    'NAR': 'orange'  // Новый код с оранжевой темой
+};
         
         // Создание падающих сердечек
         function createHearts(theme) {
             const container = document.getElementById('heartsContainer');
             container.innerHTML = '';
-            const heartColors = theme === 'purple' 
-                ? ['💜', '💗', '🩷', '💖'] 
-                : ['💙', '🩵', '🤍', '💠'];
+let heartColors;
+if (theme === 'purple') {
+    heartColors = ['💜', '💗', '🩷', '💖'];
+} else if (theme === 'blue') {
+    heartColors = ['💙', '🩵', '🤍', '💠'];
+} else { // orange theme
+    heartColors = ['🧡', '🟠', '🔥', '⭐'];
+};
             
             // Создаем 40 сердечек в разных колонках чтобы не сталкивались
             for (let i = 0; i < 40; i++) {
@@ -393,61 +409,71 @@
         });
         
         // Показать экран валентинки
-        function showValentineScreen(theme) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            const screen = document.getElementById('valentineScreen');
-            screen.classList.remove('hidden-section');
-            
-            const question = document.getElementById('mainQuestion');
-            const yesBtn = document.getElementById('yesBtn');
-            const successText = document.getElementById('successText');
-            const questionSection = document.getElementById('questionSection');
-            const successSection = document.getElementById('successSection');
-            
-            if (theme === 'purple') {
-                // Фиолетовая тема для Dich
-                screen.className = 'min-h-screen relative overflow-hidden bg-purple-gradient';
-                question.textContent = 'Дианус, станешь моей валентинкой?';
-                question.classList.add('glow-purple');
-                yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-purple-600 text-white rounded-full font-bold text-lg md:text-xl hover:bg-purple-700 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-purple-300';
-                successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-purple animate-bounce leading-tight';
-            } else {
-                // Голубая тема для Ruzz
-                screen.className = 'min-h-screen relative overflow-hidden bg-blue-gradient';
-                question.textContent = 'Рузик, станешь моей валентинкой?';
-                question.classList.add('glow-blue');
-                yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-blue-500 text-white rounded-full font-bold text-lg md:text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-blue-300';
-                successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-blue animate-bounce leading-tight';
-            }
-            
-            createHearts(theme);
-            createSparkles();
-            
-            // Сброс состояния
-            questionSection.classList.remove('hidden-section');
-            successSection.classList.add('hidden-section');
-            successSection.classList.remove('visible-section');
-            
-            // Сброс временного сообщения
-            const tempSection = document.getElementById('tempMessageSection');
-            tempSection.classList.add('hidden-section');
-            tempSection.classList.remove('visible-section');
-            
-            // Сброс кнопки "Нет"
-            const noBtn = document.getElementById('noBtn');
-            noBtn.style.display = 'block';
-            noBtn.style.position = 'relative';
-            noBtn.style.left = '0';
-            noBtn.style.top = '0';
-            noBtn.style.transform = 'none';
-            
-            // Сброс счетчика
-            noClickCount = 0;
-            if (tempMessageTimer) {
-                clearTimeout(tempMessageTimer);
-                tempMessageTimer = null;
-            }
-        }
+// Показать экран валентинки
+function showValentineScreen(theme) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    const screen = document.getElementById('valentineScreen');
+    screen.classList.remove('hidden-section');
+    
+    const question = document.getElementById('mainQuestion');
+    const yesBtn = document.getElementById('yesBtn');
+    const successText = document.getElementById('successText');
+    const questionSection = document.getElementById('questionSection');
+    const successSection = document.getElementById('successSection');
+    
+    // Удаляем все классы свечения
+    question.classList.remove('glow-purple', 'glow-blue', 'glow-orange');
+    successText.classList.remove('glow-purple', 'glow-blue', 'glow-orange');
+    
+    if (theme === 'purple') {
+        // Фиолетовая тема для Dich
+        screen.className = 'min-h-screen relative overflow-hidden bg-purple-gradient';
+        question.textContent = 'Дианус, станешь моей валентинкой?';
+        question.classList.add('glow-purple');
+        yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-purple-600 text-white rounded-full font-bold text-lg md:text-xl hover:bg-purple-700 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-purple-300';
+        successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-purple animate-bounce leading-tight';
+    } else if (theme === 'blue') {
+        // Голубая тема для Ruzz
+        screen.className = 'min-h-screen relative overflow-hidden bg-blue-gradient';
+        question.textContent = 'Ruzz, станешь моей валентинкой?';
+        question.classList.add('glow-blue');
+        yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-blue-500 text-white rounded-full font-bold text-lg md:text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-blue-300';
+        successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-blue animate-bounce leading-tight';
+    } else {
+        // Оранжевая тема для Nar
+        screen.className = 'min-h-screen relative overflow-hidden bg-orange-gradient';
+        question.textContent = 'Наринеее, станешь моей валентинкой?';
+        question.classList.add('glow-orange');
+        yesBtn.className = 'px-6 md:px-8 py-3 md:py-4 bg-orange-500 text-white rounded-full font-bold text-lg md:text-xl hover:bg-orange-600 transition-all transform hover:scale-110 shadow-2xl min-w-[100px] md:min-w-[120px] border-2 border-orange-300';
+        successText.className = 'text-3xl md:text-6xl font-romantic text-white mb-6 md:mb-8 glow-orange animate-bounce leading-tight';
+    }
+    
+    createHearts(theme);
+    createSparkles();
+    
+    // Сброс состояния
+    questionSection.classList.remove('hidden-section');
+    successSection.classList.add('hidden-section');
+    successSection.classList.remove('visible-section');
+    
+    // Сброс кнопки "Нет"
+    const noBtn = document.getElementById('noBtn');
+    noBtn.style.position = 'relative';
+    noBtn.style.left = '0';
+    noBtn.style.top = '0';
+    noBtn.style.transform = 'none';
+    
+    // Показать кнопку "Нет" и сбросить счетчик при новом открытии
+    noBtn.style.display = 'block';
+    noClickCount = 0;
+    
+    // Скрыть временное сообщение если вдруг висит
+    const tempSection = document.getElementById('tempMessageSection');
+    if (tempSection) {
+        tempSection.classList.add('hidden-section');
+        tempSection.classList.remove('visible-section');
+    }
+}
         
         // Убегающая кнопка
         function runAway(event) {
@@ -568,50 +594,55 @@
         }
         
         // Салют с сердечками и звездочками
-        function launchConfetti() {
-            const isPurple = currentTheme === 'purple';
-            const colors = isPurple 
-                ? ['#a855f7', '#c084fc', '#e9d5ff', '#f0abfc', '#ffffff']
-                : ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'];
-            
-            // Левый залп
-            confetti({
-                particleCount: 60,
-                spread: 80,
-                origin: { x: 0.2, y: 0.6 },
-                colors: colors,
-                shapes: ['circle', 'square'],
-                scalar: 1.2,
-                gravity: 0.8,
-                drift: 0
-            });
-            
-            // Правый залп
-            confetti({
-                particleCount: 60,
-                spread: 80,
-                origin: { x: 0.8, y: 0.6 },
-                colors: colors,
-                shapes: ['circle', 'square'],
-                scalar: 1.2,
-                gravity: 0.8,
-                drift: 0
-            });
-            
-            // Центральный залп (выше)
-            setTimeout(() => {
-                confetti({
-                    particleCount: 100,
-                    spread: 120,
-                    origin: { x: 0.5, y: 0.4 },
-                    colors: colors,
-                    shapes: ['circle', 'square'],
-                    scalar: 1.5,
-                    gravity: 0.6,
-                    ticks: 200
-                });
-            }, 200);
-        }
+// Салют с сердечками и звездочками
+function launchConfetti() {
+    let colors;
+    if (currentTheme === 'purple') {
+        colors = ['#a855f7', '#c084fc', '#e9d5ff', '#f0abfc', '#ffffff'];
+    } else if (currentTheme === 'blue') {
+        colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'];
+    } else {
+        colors = ['#f97316', '#fb923c', '#fdba74', '#ffedd5', '#ffffff']; // оранжевые
+    }
+    
+    // Левый залп
+    confetti({
+        particleCount: 60,
+        spread: 80,
+        origin: { x: 0.2, y: 0.6 },
+        colors: colors,
+        shapes: ['circle', 'square'],
+        scalar: 1.2,
+        gravity: 0.8,
+        drift: 0
+    });
+    
+    // Правый залп
+    confetti({
+        particleCount: 60,
+        spread: 80,
+        origin: { x: 0.8, y: 0.6 },
+        colors: colors,
+        shapes: ['circle', 'square'],
+        scalar: 1.2,
+        gravity: 0.8,
+        drift: 0
+    });
+    
+    // Центральный залп (выше)
+    setTimeout(() => {
+        confetti({
+            particleCount: 100,
+            spread: 120,
+            origin: { x: 0.5, y: 0.4 },
+            colors: colors,
+            shapes: ['circle', 'square'],
+            scalar: 1.5,
+            gravity: 0.6,
+            ticks: 200
+        });
+    }, 200);
+}
         
         // Сброс к началу
         function reset() {
