@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Valentine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Caveat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Фиолетовый градиент анимация */
+        .bg-purple-gradient {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4c1d95);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        /* Голубой градиент анимация */
+        .bg-blue-gradient {
+            background: linear-gradient(-45deg, #89f7fe, #66a6ff, #a8edea, #4facfe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Падающие сердечки */
+        .falling-heart {
+            position: absolute;
+            top: -50px;
+            animation: fall linear infinite;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        /* Шрифты */
+        .font-romantic {
+            font-family: 'Great Vibes', cursive;
+        }
+        .font-cute {
+            font-family: 'Pacifico', cursive;
+        }
+        .font-handwritten {
+            font-family: 'Caveat', cursive;
+        }
+        
+        /* Убегающая кнопка */
+        .runaway-btn {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        /* Пульсация текста */
+        .pulse-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.05); }
+        }
+        
+        /* Появление фото */
+        .photo-appear {
+            animation: photoIn 1s ease-out forwards;
+        }
+        
+        @keyframes photoIn {
+            0% { opacity: 0; transform: translateY(50px) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        /* Свечение для фиолетовой темы */
+        .glow-purple {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Свечение для голубой темы */
+        .glow-blue {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Sparkle animation */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Фото рамки */
+        .photo-frame {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease;
+        }
+        .photo-frame:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+        
+        .hidden-section {
+            display: none;
+        }
+        
+        .visible-section {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-white font-sans antialiased">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 bg-gray-900">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 max-w-md w-full border border-white/20 shadow-2xl">
+            <div class="text-center mb-8">
+                <i data-lucide="heart" class="w-16 h-16 mx-auto text-pink-500 mb-4"></i>
+                <h2 class="text-2xl font-bold text-white mb-2">Введи секретный код</h2>
+                <p class="text-gray-400 text-sm">У тебя есть специальный код? 💝</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="text" id="codeInput" placeholder="Введи код здесь..." 
+                    class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 text-center text-lg uppercase tracking-wider">
+                
+                <button onclick="checkCode()" 
+                    class="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl font-bold text-white hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                    Открыть 💌
+                </button>
+            </div>
+            
+            <p id="errorMsg" class="text-red-400 text-center mt-4 hidden text-sm">Неверный код! Попробуй еще раз...</p>
+        </div>
+    </div>
+
+    <!-- Valentine Screen -->
+    <div id="valentineScreen" class="hidden-section min-h-screen relative overflow-hidden">
+        <!-- Container for falling hearts -->
+        <div id="heartsContainer" class="absolute inset-0 pointer-events-none"></div>
+        
+        <!-- Sparkles container -->
+        <div id="sparklesContainer" class="absolute inset-0 pointer-events-none"></div>
+        
+        <!-- Main Content -->
+        <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
+            
+            <!-- Question Section -->
+            <div id="questionSection" class="text-center max-w-2xl w-full">
+                <div class="mb-8">
+                    <i data-lucide="heart" class="w-12 h-12 mx-auto mb-4 text-white/80 animate-bounce"></i>
+                </div>
+                
+                <h1 id="mainQuestion" class="text-5xl md:text-7xl font-romantic text-white mb-12 pulse-text leading-tight px-4">
+                    <!-- Текст будет вставлен через JS -->
+                </h1>
+                
+                <div class="flex flex-row justify-center gap-4 md:gap-8 flex-wrap relative" style="min-height: 100px;">
+                    <button id="yesBtn" onclick="sayYes()" 
+                        class="px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-110 shadow-2xl min-w-[120px]">
+                        Да ❤️
+                    </button>
+                    
+                    <button id="noBtn" onmouseover="runAway()" ontouchstart="runAway()"
+                        class="runaway-btn px-8 py-4 bg-white/20 backdrop-blur text-white rounded-full font-bold text-xl border-2 border-white/50 hover:bg-white/30 transition-all min-w-[120px] absolute md:relative">
+                        Нет 💔
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Success Section (Hidden initially) -->
+            <div id="successSection" class="hidden-section flex-col items-center text-center w-full max-w-4xl px-4">
+                <h2 id="successText" class="text-4xl md:text-6xl font-romantic text-white mb-8 glow-purple animate-bounce">
+                    Ура! Ты моя валентинка! 💕
+                </h2>
+                
+                <div class="flex flex-col md:flex-row gap-6 justify-center items-center w-full mb-8">
+                    <div class="photo-frame bg-white p-3 rounded-2xl transform -rotate-3 w-full md:w-auto max-w-sm">
+                        <img src="http://static.photos/couple/640x360/101" alt="Photo 1" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                    </div>
+                    <div class="photo-frame bg-white p-3 rounded-2xl transform rotate-3 w-full md:w-auto max-w-sm">
+                        <img src="http://static.photos/couple/640x360/102" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                    </div>
+                </div>
+                
+                <div class="bg-white/20 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-lg border border-white/30">
+                    <p class="text-xl md:text-2xl font-handwritten text-white leading-relaxed">
+                        Это будет наш самый особенный день! <br>
+                        Спасибо, что ты есть в моей жизни! 🌟<br>
+                        Люблю тебя! 💖
+                    </p>
+                </div>
+                
+                <button onclick="reset()" class="mt-8 text-white/80 hover:text-white underline font-handwritten text-lg">
+                    Вернуться назад
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация иконок
+        lucide.createIcons();
+        
+        let currentTheme = '';
+        const correctCodes = {
+            'RUZZ': 'blue',
+            'DICH': 'purple'
+        };
+        
+        // Создание падающих сердечек
+        function createHearts(theme) {
+            const container = document.getElementById('heartsContainer');
+            container.innerHTML = '';
+            const heartColors = theme === 'purple' 
+                ? ['💜', '💗', '🩷', '💖'] 
+                : ['💙', '🩵', '🤍', '💠'];
+            
+            // Создаем 40 сердечек в разных колонках чтобы не сталкивались
+            for (let i = 0; i < 40; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'falling-heart text-2xl md:text-4xl';
+                heart.textContent = heartColors[Math.floor(Math.random() * heartColors.length)];
+                
+                // Распределяем по колонкам (0-100%)
+                const column = (i % 10) * 10 + Math.random() * 8; // 0, 10, 20... + random
+                heart.style.left = column + '%';
+                
+                // Разная скорость и задержка
+                const duration = 8 + Math.random() * 10;
+                const delay = Math.random() * 15;
+                heart.style.animationDuration = duration + 's';
+                heart.style.animationDelay = delay + 's';
+                
+                // Разный размер
+                const scale = 0.5 + Math.random() * 1;
+                heart.style.transform = `scale(${scale})`;
+                
+                container.appendChild(heart);
+            }
+        }
+        
+        // Создание искр/звездочек
+        function createSparkles() {
+            const container = document.getElementById('sparklesContainer');
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(sparkle);
+            }
+        }
+        
+        // Проверка кода
+        function checkCode() {
+            const input = document.getElementById('codeInput').value.toUpperCase().trim();
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (correctCodes[input]) {
+                currentTheme = correctCodes[input];
+                showValentineScreen(currentTheme);
+                errorMsg.classList.add('hidden');
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('codeInput').classList.add('border-red-500');
+                setTimeout(() => {
+                    document.getElementById('codeInput').classList.remove('border-red-500');
+                }, 1000);
+            }
+        }
+        
+        // Enter key support
+        document.getElementById('codeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkCode();
+        });
+        
+        // Показать экран валентинки
+        function showValentineScreen(theme) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            const screen = document.getElementById('valentineScreen');
+            screen.classList.remove('hidden-section');
+            screen.classList.add('visible-section');
+            
+            const body = document.body;
+            const question = document.getElementById('mainQuestion');
+            const yesBtn = document.getElementById('yesBtn');
+            const successText = document.getElementById('successText');
+            
+            if (theme === 'purple') {
+                // Фиолетовая тема для Dich
+                screen.className = 'min-h-screen relative overflow-hidden bg-purple-gradient';
+                question.textContent = 'Дич, станешь моей валентинкой?';
+                question.classList.add('glow-purple');
+                yesBtn.className = 'px-8 py-4 bg-purple-600 text-white rounded-full font-bold text-xl hover:bg-purple-700 transition-all transform hover:scale-110 shadow-2xl min-w-[120px] border-2 border-purple-300';
+                successText.className = 'text-4xl md:text-6xl font-romantic text-white mb-8 glow-purple animate-bounce';
+            } else {
+                // Голубая тема для Ruzz
+                screen.className = 'min-h-screen relative overflow-hidden bg-blue-gradient';
+                question.textContent = 'Ruzz, станешь моей валентинкой?';
+                question.classList.add('glow-blue');
+                yesBtn.className = 'px-8 py-4 bg-blue-500 text-white rounded-full font-bold text-xl hover:bg-blue-600 transition-all transform hover:scale-110 shadow-2xl min-w-[120px] border-2 border-blue-300';
+                successText.className = 'text-4xl md:text-6xl font-romantic text-white mb-8 glow-blue animate-bounce';
+            }
+            
+            createHearts(theme);
+            createSparkles();
+            
+            // Сброс состояния
+            document.getElementById('questionSection').classList.remove('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('successSection').classList.remove('visible-section');
+            
+            // Сброс кнопки "Нет"
+            const noBtn = document.getElementById('noBtn');
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0';
+            noBtn.style.top = '0';
+        }
+        
+        // Убегающая кнопка
+        function runAway() {
+            const btn = document.getElementById('noBtn');
+            const rect = btn.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Вычисляем новую позицию (учитываем размер кнопки)
+            const btnWidth = rect.width;
+            const btnHeight = rect.height;
+            
+            let newX, newY;
+            let attempts = 0;
+            
+            do {
+                newX = Math.random() * (windowWidth - btnWidth - 40) + 20;
+                newY = Math.random() * (windowHeight - btnHeight - 40) + 20;
+                attempts++;
+            } while (attempts < 10 && isNearCenter(newX, newY, windowWidth, windowHeight));
+            
+            btn.style.position = 'fixed';
+            btn.style.left = newX + 'px';
+            btn.style.top = newY + 'px';
+            btn.style.zIndex = '50';
+            
+            // Добавляем эффект ухода
+            btn.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+        }
+        
+        // Проверка, не попадает ли кнопка в центр (где кнопка "Да")
+        function isNearCenter(x, y, w, h) {
+            const centerX = w / 2;
+            const centerY = h / 2;
+            return (x > centerX - 150 && x < centerX + 150 && y > centerY - 100 && y < centerY + 100);
+        }
+        
+        // Отслеживание движения мыши для кнопки "Нет" (мобильная версия обрабатывается через ontouchstart)
+        document.addEventListener('mousemove', (e) => {
+            const noBtn = document.getElementById('noBtn');
+            if (!noBtn || noBtn.style.position !== 'fixed') return;
+            
+            const rect = noBtn.getBoundingClientRect();
+            const distance = Math.hypot(e.clientX - (rect.left + rect.width/2), e.clientY - (rect.top + rect.height/2));
+            
+            // Если мышь близко (менее 80px), убегаем
+            if (distance < 80) {
+                runAway();
+            }
+        });
+        
+        // Нажатие "Да"
+        function sayYes() {
+            const questionSection = document.getElementById('questionSection');
+            const successSection = document.getElementById('successSection');
+            
+            questionSection.classList.add('hidden');
+            successSection.classList.remove('hidden-section');
+            successSection.classList.add('visible-section');
+            
+            // Добавляем классы анимации фото
+            const photos = document.querySelectorAll('.photo-frame');
+            photos.forEach((photo, index) => {
+                setTimeout(() => {
+                    photo.classList.add('photo-appear');
+                }, index * 200);
+            });
+            
+            // Запускаем салют с сердечками и звездочками
+            launchConfetti();
+            
+            // Множественные залпы салюта
+            let count = 0;
+            const interval = setInterval(() => {
+                launchConfetti();
+                count++;
+                if (count > 4) clearInterval(interval);
+            }, 1000);
+        }
+        
+        // Салют с сердечками и звездочками
+        function launchConfetti() {
+            const isPurple = currentTheme === 'purple';
+            const colors = isPurple 
+                ? ['#a855f7', '#c084fc', '#e9d5ff', '#f0abfc', '#ffffff']
+                : ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'];
+            
+            // Левый залп
+            confetti({
+                particleCount: 60,
+                spread: 80,
+                origin: { x: 0.2, y: 0.6 },
+                colors: colors,
+                shapes: ['circle', 'square', 'heart'],
+                scalar: 1.2,
+                gravity: 0.8,
+                drift: 0
+            });
+            
+            // Правый залп
+            confetti({
+                particleCount: 60,
+                spread: 80,
+                origin: { x: 0.8, y: 0.6 },
+                colors: colors,
+                shapes: ['circle', 'square', 'star'],
+                scalar: 1.2,
+                gravity: 0.8,
+                drift: 0
+            });
+            
+            // Центральный залп (выше)
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 120,
+                    origin: { x: 0.5, y: 0.4 },
+                    colors: colors,
+                    shapes: ['heart', 'star', 'circle'],
+                    scalar: 1.5,
+                    gravity: 0.6,
+                    ticks: 200
+                });
+            }, 200);
+        }
+        
+        // Сброс к началу
+        function reset() {
+            document.getElementById('valentineScreen').classList.add('hidden-section');
+            document.getElementById('valentineScreen').classList.remove('visible-section');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('codeInput').value = '';
+            document.getElementById('successSection').classList.add('hidden-section');
+            document.getElementById('successSection').classList.remove('visible-section');
+            
+            // Очистка фото
+            document.querySelectorAll('.photo-frame').forEach(p => p.classList.remove('photo-appear'));
+        }
+        
+        // Предотвращаем выход кнопки за экран при resize
+        window.addEventListener('resize', () => {
+            const noBtn = document.getElementById('noBtn');
+            if (noBtn.style.position === 'fixed') {
+                const rect = noBtn.getBoundingClientRect();
+                if (rect.right > window.innerWidth) noBtn.style.left = (window.innerWidth - rect.width - 20) + 'px';
+                if (rect.bottom > window.innerHeight) noBtn.style.top = (window.innerHeight - rect.height - 20) + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
