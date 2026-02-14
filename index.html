@@ -121,11 +121,11 @@
         }
         
         .hidden-section {
-            display: none;
+            display: none !important;
         }
-        
+
         .visible-section {
-            display: flex;
+            display: flex !important;
         }
     </style>
 </head>
@@ -181,8 +181,8 @@
                         Да ❤️
                     </button>
                     
-                    <button id="noBtn" onmouseover="runAway()" ontouchstart="runAway()"
-                        class="runaway-btn px-8 py-4 bg-white/20 backdrop-blur text-white rounded-full font-bold text-xl border-2 border-white/50 hover:bg-white/30 transition-all min-w-[120px] absolute md:relative">
+                    <button id="noBtn" onmouseover="runAway()" ontouchstart="runAway(event)"
+                        class="runaway-btn px-8 py-4 bg-white/20 backdrop-blur text-white rounded-full font-bold text-xl border-2 border-white/50 hover:bg-white/30 transition-all min-w-[120px] relative">
                         Нет 💔
                     </button>
                 </div>
@@ -195,11 +195,11 @@
                 </h2>
                 
                 <div class="flex flex-col md:flex-row gap-6 justify-center items-center w-full mb-8">
-                    <div class="photo-frame bg-white p-3 rounded-2xl transform -rotate-3 w-full md:w-auto max-w-sm">
-                        <img src="http://static.photos/couple/640x360/101" alt="Photo 1" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                    <div class="photo-frame bg-white p-3 rounded-2xl transform -rotate-3 w-full md:w-auto max-w-sm opacity-0">
+                        <img src="111.jpg" alt="Photo 1" class="w-full h-64 md:h-80 object-cover rounded-xl">
                     </div>
-                    <div class="photo-frame bg-white p-3 rounded-2xl transform rotate-3 w-full md:w-auto max-w-sm">
-                        <img src="http://static.photos/couple/640x360/102" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                    <div class="photo-frame bg-white p-3 rounded-2xl transform rotate-3 w-full md:w-auto max-w-sm opacity-0">
+                        <img src="222.jpg" alt="Photo 2" class="w-full h-64 md:h-80 object-cover rounded-xl">
                     </div>
                 </div>
                 
@@ -263,6 +263,7 @@
         // Создание искр/звездочек
         function createSparkles() {
             const container = document.getElementById('sparklesContainer');
+            container.innerHTML = '';
             for (let i = 0; i < 20; i++) {
                 const sparkle = document.createElement('div');
                 sparkle.className = 'sparkle';
@@ -301,12 +302,12 @@
             document.getElementById('loginScreen').classList.add('hidden');
             const screen = document.getElementById('valentineScreen');
             screen.classList.remove('hidden-section');
-            screen.classList.add('visible-section');
             
-            const body = document.body;
             const question = document.getElementById('mainQuestion');
             const yesBtn = document.getElementById('yesBtn');
             const successText = document.getElementById('successText');
+            const questionSection = document.getElementById('questionSection');
+            const successSection = document.getElementById('successSection');
             
             if (theme === 'purple') {
                 // Фиолетовая тема для Dich
@@ -327,20 +328,23 @@
             createHearts(theme);
             createSparkles();
             
-            // Сброс состояния
-            document.getElementById('questionSection').classList.remove('hidden');
-            document.getElementById('successSection').classList.add('hidden');
-            document.getElementById('successSection').classList.remove('visible-section');
+            // Сброс состояния - ИСПРАВЛЕНО: используем правильные классы
+            questionSection.classList.remove('hidden-section');
+            successSection.classList.add('hidden-section');
+            successSection.classList.remove('visible-section');
             
             // Сброс кнопки "Нет"
             const noBtn = document.getElementById('noBtn');
             noBtn.style.position = 'relative';
             noBtn.style.left = '0';
             noBtn.style.top = '0';
+            noBtn.style.transform = 'none';
         }
         
         // Убегающая кнопка
-        function runAway() {
+        function runAway(event) {
+            if (event) event.preventDefault();
+            
             const btn = document.getElementById('noBtn');
             const rect = btn.getBoundingClientRect();
             const windowWidth = window.innerWidth;
@@ -357,7 +361,7 @@
                 newX = Math.random() * (windowWidth - btnWidth - 40) + 20;
                 newY = Math.random() * (windowHeight - btnHeight - 40) + 20;
                 attempts++;
-            } while (attempts < 10 && isNearCenter(newX, newY, windowWidth, windowHeight));
+            } while (attempts < 10 && isNearCenter(newX, newY, windowWidth, windowHeight, btnWidth, btnHeight));
             
             btn.style.position = 'fixed';
             btn.style.left = newX + 'px';
@@ -369,53 +373,45 @@
         }
         
         // Проверка, не попадает ли кнопка в центр (где кнопка "Да")
-        function isNearCenter(x, y, w, h) {
+        function isNearCenter(x, y, w, h, btnW, btnH) {
             const centerX = w / 2;
             const centerY = h / 2;
-            return (x > centerX - 150 && x < centerX + 150 && y > centerY - 100 && y < centerY + 100);
+            const btnCenterX = x + btnW / 2;
+            const btnCenterY = y + btnH / 2;
+            return (Math.abs(btnCenterX - centerX) < 150 && Math.abs(btnCenterY - centerY) < 100);
         }
         
-        // Отслеживание движения мыши для кнопки "Нет" (мобильная версия обрабатывается через ontouchstart)
-        document.addEventListener('mousemove', (e) => {
-            const noBtn = document.getElementById('noBtn');
-            if (!noBtn || noBtn.style.position !== 'fixed') return;
-            
-            const rect = noBtn.getBoundingClientRect();
-            const distance = Math.hypot(e.clientX - (rect.left + rect.width/2), e.clientY - (rect.top + rect.height/2));
-            
-            // Если мышь близко (менее 80px), убегаем
-            if (distance < 80) {
-                runAway();
-            }
-        });
-        
-        // Нажатие "Да"
+        // Нажатие "Да" - ИСПРАВЛЕНО: используем правильные классы
         function sayYes() {
             const questionSection = document.getElementById('questionSection');
             const successSection = document.getElementById('successSection');
             
-            questionSection.classList.add('hidden');
+            // Скрываем вопрос и показываем успех
+            questionSection.classList.add('hidden-section');
             successSection.classList.remove('hidden-section');
             successSection.classList.add('visible-section');
             
-            // Добавляем классы анимации фото
+            // Добавляем классы анимации фото с задержкой
             const photos = document.querySelectorAll('.photo-frame');
             photos.forEach((photo, index) => {
+                // Сначала делаем видимым (opacity-0 убрано через класс photo-appear)
                 setTimeout(() => {
                     photo.classList.add('photo-appear');
-                }, index * 200);
+                }, index * 300 + 100);
             });
             
             // Запускаем салют с сердечками и звездочками
-            launchConfetti();
-            
-            // Множественные залпы салюта
-            let count = 0;
-            const interval = setInterval(() => {
+            setTimeout(() => {
                 launchConfetti();
-                count++;
-                if (count > 4) clearInterval(interval);
-            }, 1000);
+                
+                // Множественные залпы салюта
+                let count = 0;
+                const interval = setInterval(() => {
+                    launchConfetti();
+                    count++;
+                    if (count > 4) clearInterval(interval);
+                }, 800);
+            }, 300);
         }
         
         // Салют с сердечками и звездочками
@@ -431,7 +427,7 @@
                 spread: 80,
                 origin: { x: 0.2, y: 0.6 },
                 colors: colors,
-                shapes: ['circle', 'square', 'heart'],
+                shapes: ['circle', 'square'],
                 scalar: 1.2,
                 gravity: 0.8,
                 drift: 0
@@ -443,7 +439,7 @@
                 spread: 80,
                 origin: { x: 0.8, y: 0.6 },
                 colors: colors,
-                shapes: ['circle', 'square', 'star'],
+                shapes: ['circle', 'square'],
                 scalar: 1.2,
                 gravity: 0.8,
                 drift: 0
@@ -456,7 +452,7 @@
                     spread: 120,
                     origin: { x: 0.5, y: 0.4 },
                     colors: colors,
-                    shapes: ['heart', 'star', 'circle'],
+                    shapes: ['circle', 'square'],
                     scalar: 1.5,
                     gravity: 0.6,
                     ticks: 200
@@ -470,11 +466,20 @@
             document.getElementById('valentineScreen').classList.remove('visible-section');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('codeInput').value = '';
-            document.getElementById('successSection').classList.add('hidden-section');
-            document.getElementById('successSection').classList.remove('visible-section');
+            
+            const successSection = document.getElementById('successSection');
+            successSection.classList.add('hidden-section');
+            successSection.classList.remove('visible-section');
             
             // Очистка фото
-            document.querySelectorAll('.photo-frame').forEach(p => p.classList.remove('photo-appear'));
+            document.querySelectorAll('.photo-frame').forEach(p => {
+                p.classList.remove('photo-appear');
+                p.style.opacity = '0';
+            });
+            
+            // Очистка анимаций градиента
+            const screen = document.getElementById('valentineScreen');
+            screen.className = 'hidden-section min-h-screen relative overflow-hidden';
         }
         
         // Предотвращаем выход кнопки за экран при resize
